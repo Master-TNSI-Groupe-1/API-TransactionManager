@@ -1,0 +1,6 @@
+## CONFIG SLIM_FRAMEWORK ##
+.DS_Store
+composer.json
+composer.lock
+composer.phar
+vendor/**
