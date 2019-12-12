@@ -1,0 +1,11 @@
+{
+	"autoload": {
+        "psr-4": {
+            "Socket\\": "src\\websocket"
+        }
+    },
+    "require": {
+        "slim/slim": "3.*",
+        "cboden/ratchet": "^0.4"
+    }
+}
