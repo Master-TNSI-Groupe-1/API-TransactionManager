@@ -1,0 +1,11 @@
+{
+    "require": {
+        "slim/slim": "3.*",
+        "ext-pdo": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "structures\\": "src/structures/"
+        }
+    }
+}
