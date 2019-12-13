@@ -36,3 +36,9 @@ php -S localhost:8080
 
 http://localhost:8080/get/champion/*votre nom*
 http://localhost:8080/get/champion
+
+
+
+- 8 GENEGER swagger.json afin d'exporter les annotations au swagger
+
+vendor/bin/openapi --format json --output swagger/swagger.json src
