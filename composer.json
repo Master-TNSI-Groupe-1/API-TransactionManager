@@ -1,11 +1,13 @@
 {
     "require": {
         "slim/slim": "3.*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "cboden/ratchet": "^0.4"
     },
     "autoload": {
         "psr-4": {
-            "structures\\": "src/structures/"
+            "structures\\": "src/structures/",
+            "Socket\\": "src\\websocket"
         }
     }
 }
