@@ -2,22 +2,10 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \structures\Data as Data;
+// use \structures\Database as DataBase;
 
 require '../vendor/autoload.php';
-
-//TODO : TEMPORAIRE : A modifier/supprimer dès qu'Anas à fait la co à la bdd.
-function getDatabase(){
-    $host = "localhost";
-    $port = 3307;
-    $user = "root";
-    $password = "";
-    $dbname = "apidb";
-
-    $dbconfig = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8";
-    $db = new PDO($dbconfig, $user, $password);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    return $db;
-}
+require 'config/Database.php';
 
 $configuration = [
     'settings' => [
@@ -25,8 +13,9 @@ $configuration = [
     ],
 ];
 $c = new \Slim\Container($configuration);
-
 $app = new \Slim\App($c);
+
+// $db = Database::getInstance()->getDb();
 
 /**
  * Récupère les lieux pour un site donnée
@@ -38,9 +27,10 @@ $app->get('/get/lieux/{idsite}', function (Request $request, Response $response)
 
     try{
         //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        $db = getDatabase();
+        
 
         $id = $request->getAttribute('idsite');
+        $db = Database::getInstance()->getDb();
 
         // Récupère les lieux
         $query = $db->prepare("SELECT * FROM location WHERE id_site = :idsite");
@@ -77,9 +67,10 @@ $app->get('/get/lieu/{id}', function (Request $request, Response $response) {
 
     try{
         //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        $db = getDatabase();
+        
 
         $id = $request->getAttribute('id');
+        $db = Database::getInstance()->getDb();
 
         // Récupère les lieux
         $query = $db->prepare("SELECT * FROM location WHERE id_location = :id");
@@ -114,7 +105,7 @@ $app->get('/get/sites', function (Request $request, Response $response) {
 
     try{
         //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        $db = getDatabase();
+        $db = Database::getInstance()->getDb();
 
         $query = $db->query("SELECT * FROM site");
 
@@ -151,8 +142,8 @@ $app->post('/post/lieu', function (Request $request, Response $response){
 
     try{
         //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        $db = getDatabase();
-
+        
+        $db = Database::getInstance()->getDb();
         $postData = $request->getParsedBody();
 
         $query = $db->prepare("INSERT INTO location(name, number_places, id_site) VALUES (:nomCategorie, :capMax, :idCategorie)");
@@ -199,8 +190,8 @@ $app->delete('/delete/lieu/{id}', function(Request $request, Response $response)
 
     try{
         //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        $db = getDatabase();
-
+        
+        $db = Database::getInstance()->getDb();
         $id = $request->getAttribute('id');
 
         $query = $db->prepare("DELETE FROM location WHERE id_location = :idlocation");
