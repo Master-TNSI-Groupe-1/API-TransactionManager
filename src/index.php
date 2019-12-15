@@ -227,6 +227,47 @@ $app->delete('/delete/lieu/{id}', function(Request $request, Response $response)
     return $response->withJson($data, $data->code);
 });
 
+$app->get('/sensor/pulsation/{idsensor}', function(Request $request, Response $response){
+    $data = new Data();
+
+    try{
+        // TODO : A changer quand Anas aura fait son pull request pour la gestion de la co à la bdd
+        $db = getDatabase();
+
+        // Récup l'id du sensor en paramètre
+        $idsensor = $request->getAttribute('idsensor');
+
+        // On récupère les infos du lieu et sensors associé à l'id du sensor
+        $query = $db->prepare('SELECT * FROM sensors s, location l WHERE l.id_location = s.id_location AND s.id_sensor = :idsensor');
+        $query->bindParam(':idsensor', $idsensor, PDO::PARAM_INT);
+        $query->execute();
+        $lieu = $query->fetch(PDO::FETCH_OBJ);
+
+
+        if($lieu){
+            $idlieu = $lieu->id_location;
+            ($lieu->is_input == 1) ? $valueinputsensor = 1 : $valueinputsensor = -1;
+
+            // En fonction du type de sensor on incrémente ou décrémente la valeur instantanée de 1.
+            $query2 = $db->prepare('UPDATE location SET number_user = number_user + :increment WHERE id_location = :idlocation');
+            $query2->bindParam(':idlocation', $idlieu, PDO::PARAM_INT);
+            $query2->bindParam(':increment', $valueinputsensor, PDO::PARAM_INT);
+            $query2->execute();
+
+            $data->code = 200;
+            $data->status = "success";
+            $data->message = "Valeur mise à jour ($valueinputsensor)";
+        }else{
+            $data->message = "Le lieu ou le capteur n'existe pas.";
+        }
+
+    }catch (Exception $e){
+        $data->message = $e->getMessage();
+    }
+
+    return $response->withJson($data, $data->code);
+});
+
 $app->run();
 
 
