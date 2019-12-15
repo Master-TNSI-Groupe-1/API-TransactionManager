@@ -6,20 +6,18 @@ use \structures\Data as Data;
 require '../vendor/autoload.php';
 
 //TODO : TEMPORAIRE : A modifier/supprimer dès qu'Anas à fait la co à la bdd.
-//function getDatabase(){
-//    $host = "localhost";
-//    $port = 3307;
-//    $user = "root";
-//    $password = "";
-//    $dbname = "apidb";
-//
-//    $dbconfig = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8";
-//    $db = new PDO($dbconfig, $user, $password);
-//    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-//    return $db;
-//}
+function getDatabase(){
+    $host = "localhost";
+    $port = 3307;
+    $user = "root";
+    $password = "";
+    $dbname = "apidb";
 
-require("config/Database.php");
+    $dbconfig = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8";
+    $db = new PDO($dbconfig, $user, $password);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    return $db;
+}
 
 $configuration = [
     'settings' => [
@@ -40,7 +38,7 @@ $app->get('/get/lieux/{idsite}', function (Request $request, Response $response)
 
     try{
         //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        $db = Database::getInstance()->getDb();
+        $db = getDatabase();
 
         $id = $request->getAttribute('idsite');
 
@@ -79,7 +77,7 @@ $app->get('/get/lieu/{id}', function (Request $request, Response $response) {
 
     try{
         //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        $db = Database::getInstance()->getDb();
+        $db = getDatabase();
 
         $id = $request->getAttribute('id');
 
