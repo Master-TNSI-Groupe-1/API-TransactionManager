@@ -155,7 +155,7 @@ $app->post('/post/lieu', function (Request $request, Response $response){
 
         $postData = $request->getParsedBody();
 
-        $query = $db->prepare("INSERT INTO location(name, number_places, id_site) VALUES (:nomCategorie, :capMax, :idCategorie)");
+        $query = $db->prepare("INSERT INTO location(name, number_places, number_user, is_enabled, id_site) VALUES (:nomCategorie, :capMax, 0, 1, :idCategorie)");
         $query->bindParam(":nomCategorie", $postData["nomCategorie"], PDO::PARAM_STR_CHAR);
         $query->bindParam(":capMax", $postData["capMax"], PDO::PARAM_INT);
         $query->bindParam(":idCategorie", $postData["idCategorie"], PDO::PARAM_INT);
@@ -173,7 +173,7 @@ $app->post('/post/lieu', function (Request $request, Response $response){
 
         //TODO : Revoir la partie sensors, données à insert ??
         for ($i = 1; $i <= $postData["sensors"]; $i++){
-            $query3 = $db->prepare("INSERT INTO sensors(id_location) VALUES(:idlocation)");
+            $query3 = $db->prepare("INSERT INTO sensors(id_location, is_enabled, is_input) VALUES(:idlocation, 1, 1)");
             $query3->bindParam(":idlocation", $lastId, PDO::PARAM_INT);
             $query3->execute();
         }
