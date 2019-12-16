@@ -2,7 +2,6 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \structures\Data as Data;
-// use \structures\Database as DataBase;
 
 require '../vendor/autoload.php';
 require 'config/Database.php';
@@ -15,8 +14,6 @@ $configuration = [
 $c = new \Slim\Container($configuration);
 $app = new \Slim\App($c);
 
-// $db = Database::getInstance()->getDb();
-
 /**
  * Récupère les lieux pour un site donnée
  * {id} ID du site
@@ -26,9 +23,6 @@ $app->get('/get/lieux/{idsite}', function (Request $request, Response $response)
     $data = new Data();
 
     try{
-        //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        
-
         $id = $request->getAttribute('idsite');
         $db = Database::getInstance()->getDb();
 
@@ -66,9 +60,6 @@ $app->get('/get/lieu/{id}', function (Request $request, Response $response) {
     $data = new Data();
 
     try{
-        //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        
-
         $id = $request->getAttribute('id');
         $db = Database::getInstance()->getDb();
 
@@ -104,7 +95,6 @@ $app->get('/get/sites', function (Request $request, Response $response) {
     $data = new Data();
 
     try{
-        //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
         $db = Database::getInstance()->getDb();
 
         $query = $db->query("SELECT * FROM site");
@@ -141,8 +131,6 @@ $app->post('/post/lieu', function (Request $request, Response $response){
     $data = new Data();
 
     try{
-        //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        
         $db = Database::getInstance()->getDb();
         $postData = $request->getParsedBody();
 
@@ -162,7 +150,6 @@ $app->post('/post/lieu', function (Request $request, Response $response){
             $query2->execute();
         }
 
-        //TODO : Revoir la partie sensors, données à insert ??
         for ($i = 1; $i <= $postData["sensors"]; $i++){
             $query3 = $db->prepare("INSERT INTO sensors(id_location, is_enabled, is_input) VALUES(:idlocation, 1, 1)");
             $query3->bindParam(":idlocation", $lastId, PDO::PARAM_INT);
@@ -189,8 +176,6 @@ $app->delete('/delete/lieu/{id}', function(Request $request, Response $response)
     $data = new Data();
 
     try{
-        //TODO : Changer la façon dont on se connecte à la BDD, voir en fonction de ce qu'à fait Anas.
-        
         $db = Database::getInstance()->getDb();
         $id = $request->getAttribute('id');
 
@@ -218,12 +203,15 @@ $app->delete('/delete/lieu/{id}', function(Request $request, Response $response)
     return $response->withJson($data, $data->code);
 });
 
+/**
+ * Permet d'incrémenter ou décrémenter la valeur en fonction du l'id du sensor.
+ * {idsensor} ID du sensor
+ */
 $app->get('/sensor/pulsation/{idsensor}', function(Request $request, Response $response){
     $data = new Data();
 
     try{
-        // TODO : A changer quand Anas aura fait son pull request pour la gestion de la co à la bdd
-        $db = getDatabase();
+        $db = Database::getInstance()->getDb();
 
         // Récup l'id du sensor en paramètre
         $idsensor = $request->getAttribute('idsensor');
@@ -252,6 +240,56 @@ $app->get('/sensor/pulsation/{idsensor}', function(Request $request, Response $r
             $data->message = "Le lieu ou le capteur n'existe pas.";
         }
 
+    }catch (Exception $e){
+        $data->message = $e->getMessage();
+    }
+
+    return $response->withJson($data, $data->code);
+});
+
+/**
+ * Permet d'incrémenter la valeur en fonction de l'id du lieu
+ * {idlieu} ID du lieu
+ */
+$app->get('/lieu/increment/{idlieu}', function (Request $request, Response $response){
+    $data = new Data();
+
+    try{
+        $db = Database::getInstance()->getDb();
+        $idlieu = $request->getAttribute('idlieu');
+
+        $query = $db->prepare('UPDATE location SET number_user = number_user + 1 WHERE id_location = :idlocation');
+        $query->bindParam(':idlocation', $idlieu, PDO::PARAM_INT);
+        $query->execute();
+
+        $data->code = 200;
+        $data->status = "success";
+        $data->message = "Valeur mise à jour (1)";
+    }catch (Exception $e){
+        $data->message = $e->getMessage();
+    }
+
+    return $response->withJson($data, $data->code);
+});
+
+/**
+ * Permet de décrémenter la valeur en fonction de l'id du lieu
+ * {idlieu} ID du lieu
+ */
+$app->get('/lieu/decrement/{idlieu}', function (Request $request, Response $response){
+    $data = new Data();
+
+    try{
+        $db = Database::getInstance()->getDb();
+        $idlieu = $request->getAttribute('idlieu');
+
+        $query = $db->prepare('UPDATE location SET number_user = number_user - 1 WHERE id_location = :idlocation');
+        $query->bindParam(':idlocation', $idlieu, PDO::PARAM_INT);
+        $query->execute();
+
+        $data->code = 200;
+        $data->status = "success";
+        $data->message = "Valeur mise à jour (-1)";
     }catch (Exception $e){
         $data->message = $e->getMessage();
     }
