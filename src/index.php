@@ -207,7 +207,7 @@ $app->delete('/delete/lieu/{id}', function(Request $request, Response $response)
  * Permet d'incrémenter ou décrémenter la valeur en fonction du l'id du sensor.
  * {idsensor} ID du sensor
  */
-$app->get('/sensor/pulsation/{idsensor}', function(Request $request, Response $response){
+$app->get('/get/sensor/pulsation/{idsensor}', function(Request $request, Response $response){
     $data = new Data();
 
     try{
@@ -251,7 +251,7 @@ $app->get('/sensor/pulsation/{idsensor}', function(Request $request, Response $r
  * Permet d'incrémenter la valeur en fonction de l'id du lieu
  * {idlieu} ID du lieu
  */
-$app->get('/lieu/increment/{idlieu}', function (Request $request, Response $response){
+$app->get('/get/lieu/increment/{idlieu}', function (Request $request, Response $response){
     $data = new Data();
 
     try{
@@ -276,7 +276,7 @@ $app->get('/lieu/increment/{idlieu}', function (Request $request, Response $resp
  * Permet de décrémenter la valeur en fonction de l'id du lieu
  * {idlieu} ID du lieu
  */
-$app->get('/lieu/decrement/{idlieu}', function (Request $request, Response $response){
+$app->get('/get/lieu/decrement/{idlieu}', function (Request $request, Response $response){
     $data = new Data();
 
     try{
