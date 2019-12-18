@@ -96,38 +96,6 @@ $app->get('/get/lieux/{idsite}', function (Request $request, Response $response)
  *
  */
 $app->get('/get/lieu/{id}', function (Request $request, Response $response) {
-<<<<<<< HEAD
- // Initialise un objet Data avec les valeurs par défaut.
- $data = new Data();
-
- try {
-  $id = $request->getAttribute('id');
-  $db = Database::getInstance()->getDb();
-
-  // Récupère les lieux
-  $query = $db->prepare("SELECT * FROM location WHERE id_location = :id");
-  $query->bindParam(':id', $id, PDO::PARAM_INT);
-  $query->execute();
-
-  $lieu = $query->fetch(PDO::FETCH_OBJ);
-
-  if ($lieu) {
-   // Les données de la requête sont affectées à la var $data.
-   $data->data    = $lieu;
-   $data->status  = "success";
-   $data->message = "Ok.";
-   $data->code    = 200;
-  } else {
-   $data->message = "Pas de lieu.";
-  }
-
- } catch (Exception $e) {
-  $data->message = $e->getMessage();
- }
-
- // Renvoie du résultat sous format JSON avec le code de retour HTTP
- return $response->withJson($data, $data->code);
-=======
     // Initialise un objet Data avec les valeurs par défaut.
     $data = new Data();
 
@@ -174,7 +142,6 @@ $app->get('/get/lieu/{id}', function (Request $request, Response $response) {
 
     // Renvoie du résultat sous format JSON avec le code de retour HTTP
     return $response->withJson($data, $data->code);
->>>>>>> b95658f7a1cc69d771e0b484b7de7d786a3f22a8
 });
 
 /**
