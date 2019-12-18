@@ -70,9 +70,25 @@ $app->get('/get/lieu/{id}', function (Request $request, Response $response) {
 
         $lieu = $query->fetch(PDO::FETCH_OBJ);
 
+        // Récupère les sensors
+        $query2 = $db->prepare('SELECT * FROM sensors WHERE id_location = :idlocation');
+        $query2->bindParam(':idlocation', $id, PDO::PARAM_INT);
+        $query2->execute();
+
+        $sensors = $query2->fetchAll(PDO::FETCH_OBJ);
+
+        // Récupère les pointxy
+        $query3 = $db->prepare('SELECT * FROM pointxy WHERE id_location = :idlocation');
+        $query3->bindParam(':idlocation', $id, PDO::PARAM_INT);
+        $query3->execute();
+
+        $pointxy = $query3->fetchAll(PDO::FETCH_OBJ);
+
         if($lieu){
             // Les données de la requête sont affectées à la var $data.
             $data->data = $lieu;
+            $data->data->sensors = $sensors;
+            $data->data->pointxy = $pointxy;
             $data->status = "success";
             $data->message = "Ok.";
             $data->code = 200;
