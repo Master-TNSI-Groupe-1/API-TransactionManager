@@ -96,6 +96,7 @@ $app->get('/get/lieux/{idsite}', function (Request $request, Response $response)
  *
  */
 $app->get('/get/lieu/{id}', function (Request $request, Response $response) {
+<<<<<<< HEAD
  // Initialise un objet Data avec les valeurs par défaut.
  $data = new Data();
 
@@ -126,6 +127,54 @@ $app->get('/get/lieu/{id}', function (Request $request, Response $response) {
 
  // Renvoie du résultat sous format JSON avec le code de retour HTTP
  return $response->withJson($data, $data->code);
+=======
+    // Initialise un objet Data avec les valeurs par défaut.
+    $data = new Data();
+
+    try{
+        $id = $request->getAttribute('id');
+        $db = Database::getInstance()->getDb();
+
+        // Récupère les lieux
+        $query = $db->prepare("SELECT * FROM location WHERE id_location = :id");
+        $query->bindParam(':id', $id, PDO::PARAM_INT);
+        $query->execute();
+
+        $lieu = $query->fetch(PDO::FETCH_OBJ);
+
+        // Récupère les sensors
+        $query2 = $db->prepare('SELECT * FROM sensors WHERE id_location = :idlocation');
+        $query2->bindParam(':idlocation', $id, PDO::PARAM_INT);
+        $query2->execute();
+
+        $sensors = $query2->fetchAll(PDO::FETCH_OBJ);
+
+        // Récupère les pointxy
+        $query3 = $db->prepare('SELECT * FROM pointxy WHERE id_location = :idlocation');
+        $query3->bindParam(':idlocation', $id, PDO::PARAM_INT);
+        $query3->execute();
+
+        $pointxy = $query3->fetchAll(PDO::FETCH_OBJ);
+
+        if($lieu){
+            // Les données de la requête sont affectées à la var $data.
+            $data->data = $lieu;
+            $data->data->sensors = $sensors;
+            $data->data->pointxy = $pointxy;
+            $data->status = "success";
+            $data->message = "Ok.";
+            $data->code = 200;
+        }else{
+            $data->message = "Pas de lieu.";
+        }
+
+    }catch (Exception $e){
+        $data->message = $e->getMessage();
+    }
+
+    // Renvoie du résultat sous format JSON avec le code de retour HTTP
+    return $response->withJson($data, $data->code);
+>>>>>>> b95658f7a1cc69d771e0b484b7de7d786a3f22a8
 });
 
 /**
@@ -451,6 +500,40 @@ $app->get('/get/lieu/decrement/{idlieu}', function (Request $request, Response $
  }
 
  return $response->withJson($data, $data->code);
+});
+
+/**
+ * Retourner les prévisions IA.
+ * {idlocation} id location.
+ */
+$app->get('/get/previsions/{idlocation}', function (Request $request, Response $response){
+   $data = new Data();
+
+   try{
+       $db = Database::getInstance()->getDb();
+       $idlocation = $request->getAttribute('idlocation');
+
+       $query = $db->prepare('SELECT * FROM iadata WHERE id_location = :idlocation ORDER BY date_update DESC');
+       $query->bindParam(':idlocation', $idlocation, PDO::PARAM_INT);
+       $query->execute();
+
+       $iadata = $query->fetch(PDO::FETCH_OBJ);
+
+       if($iadata){
+           $data->code = 200;
+           $data->status = "success";
+           $data->message = "Ok.";
+           $data->data = $iadata;
+           $data->data->json_object = json_decode($iadata->json_object);
+       }else{
+           $data->message = "Pas de donnees.";
+       }
+
+   }catch (Exception $e){
+       $data->message = $e->getMessage();
+   }
+
+   return $response->withJson($data, $data->code);
 });
 
 $app->run();
