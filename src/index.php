@@ -308,22 +308,18 @@ $app->get('/get/previsions/{idlocation}', function (Request $request, Response $
        $db = Database::getInstance()->getDb();
        $idlocation = $request->getAttribute('idlocation');
 
-       $query = $db->prepare('SELECT * FROM iadata WHERE id_location = :idlocation');
+       $query = $db->prepare('SELECT * FROM iadata WHERE id_location = :idlocation ORDER BY date_update DESC');
        $query->bindParam(':idlocation', $idlocation, PDO::PARAM_INT);
        $query->execute();
 
-       $iadata = $query->fetchAll(PDO::FETCH_ASSOC);
+       $iadata = $query->fetch(PDO::FETCH_OBJ);
 
        if($iadata){
            $data->code = 200;
            $data->status = "success";
            $data->message = "Ok.";
            $data->data = $iadata;
-           $i = 0;
-           foreach ($iadata as $value){
-               $data->data[$i]["json_object"] = json_decode($value["json_object"]);
-               $i++;
-           }
+           $data->data->json_object = json_decode($iadata->json_object);
        }else{
            $data->message = "Pas de donnees.";
        }
