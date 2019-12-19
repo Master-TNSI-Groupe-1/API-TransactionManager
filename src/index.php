@@ -1,5 +1,22 @@
 <?php
-use OpenApi\Annotations as OA;
+/**
+ * @OA\Info(
+ *   title="Documentation de l'API",
+ *   description="Cette API permet de gérer les sites et lieux (récupération d'informations, incrémentation/décrémentation du nombre de places).",
+ *   version="1.0.0"
+ * )
+ *
+ * @OA\Server(
+ *     description="API Production",
+ *     url="http://3.87.54.32"
+ * )
+ *
+ * @OA\Server(
+ *     description="API Test",
+ *     url="http://localhost:8080"
+ * )
+ */
+
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \structures\Data as Data;
@@ -15,28 +32,34 @@ $configuration = [
 $c   = new \Slim\Container($configuration);
 $app = new \Slim\App($c);
 
+
 /**
  * @OA\Get(
- *     path="get/lieux/{idsite}",
- *     tags={"idsite"},
- *     summary="Récupère les lieux pour un site donnée",
- *     description="Récupère une liste des lieux",
+ *   path="/get/lieux/{idsite}",
+ *   summary="Récupère les lieux pour un site passé en paramètre.",
+ *   tags={"Lieux"},
  *     @OA\Parameter(
  *         name="idsite",
  *         in="path",
- *         description="ID du site",
+ *         description="ID du site.",
  *         required=true,
  *         @OA\Schema(
- *             type="integer",
- *             format="int64"
- *         )
+ *           type="integer",
+ *           format="int64"
+ *         ),
  *     ),
- *     @OA\Response(
- *         response=200,
- *         description="{"status":"success","message":"Ok.","code":200,"data":[{"id_location":"0","name":"Test POST","url_image":null,"is_enabled":"1","number_places":"900","number_user":"1","id_site":"1"},{"id_location":"3","name":"RU","url_image":"","is_enabled":"0","number_places":"200","number_user":"-55","id_site":"1"}]}",
- *     )
- * )
+ *   @OA\Response(
+ *     response=200,
+ *     description="Une liste de lieux.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
  *
+ *   ),
+ *   @OA\Response(
+ *     response=404,
+ *     description="Une erreur est survenue.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *   )
+ * )
  */
 $app->get('/get/lieux/{idsite}', function (Request $request, Response $response) {
  // Initialise un objet Data avec les valeurs par défaut.
@@ -68,39 +91,43 @@ $app->get('/get/lieux/{idsite}', function (Request $request, Response $response)
  }
 
  // Renvoie du résultat sous format JSON avec le code de retour HTTP
- return $response->withJson($data, $data->code);
+ return $response->withHeader('Access-Control-Allow-Origin', '*')->withJson($data, $data->code);
 });
 
 /**
  * @OA\Get(
- *     path="get/lieu/{id}",
- *     tags={"id"},
- *     summary="Récupère la capacité actuelle, la capacité max et le nom du lieu",
- *     description="Récupère la capacité actuelle, la capacité max et le nom du lieu",
+ *   path="/get/lieu/{idlieu}",
+ *   summary="Récupère les informations d'un lieu en paramètre (infos du lieu, capteurs, coordonnées).",
+ *   tags={"Lieux"},
  *     @OA\Parameter(
- *         name="id",
+ *         name="idlieu",
  *         in="path",
- *         description="ID du lieu",
+ *         description="ID du lieu.",
  *         required=true,
  *         @OA\Schema(
- *             type="integer",
- *             format="int64"
- *             example="3"
- *         )
+ *           type="integer",
+ *           format="int64"
+ *         ),
  *     ),
- *     @OA\Response(
- *         response=200,
- *         description="{"status":"success","message":"Ok.","code":200,"data":{"id_location":"3","name":"RU","url_image":"","is_enabled":"0","number_places":"200","number_user":"-55","id_site":"1"}}",
- *     )
- * )
+ *   @OA\Response(
+ *     response=200,
+ *     description="Informations d'un lieu.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
  *
+ *   ),
+ *   @OA\Response(
+ *     response=404,
+ *     description="Une erreur est survenue.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *   )
+ * )
  */
-$app->get('/get/lieu/{id}', function (Request $request, Response $response) {
+$app->get('/get/lieu/{idlieu}', function (Request $request, Response $response) {
     // Initialise un objet Data avec les valeurs par défaut.
     $data = new Data();
 
     try{
-        $id = $request->getAttribute('id');
+        $id = $request->getAttribute('idlieu');
         $db = Database::getInstance()->getDb();
 
         // Récupère les lieux
@@ -141,23 +168,26 @@ $app->get('/get/lieu/{id}', function (Request $request, Response $response) {
     }
 
     // Renvoie du résultat sous format JSON avec le code de retour HTTP
-    return $response->withJson($data, $data->code);
+    return $response->withHeader('Access-Control-Allow-Origin', '*')->withJson($data, $data->code);
 });
 
 /**
  * @OA\Get(
- *     path="get/sites/",
- *     summary="Récupère les sites",
- *     description="Récupère les sites",
- *     @OA\Response(
- *         response=200,
- *         description="{"status":"success","message":"Ok.","code":200,"data":[{"id_location":"0","name":"Test POST","url_image":null,"is_enabled":"1","number_places":"900","number_user":"1","id_site":"1"},{"id_location":"3","name":"RU","url_image":"","is_enabled":"0","number_places":"200","number_user":"-55","id_site":"1"}]}",
- *     )
- * )
+ *   path="/get/sites",
+ *   summary="Récupère les sites.",
+ *   tags={"Sites"},
+ *   @OA\Response(
+ *     response=200,
+ *     description="Une liste de sites.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
  *
- */
-/**
- * Récupère les sites
+ *   ),
+ *   @OA\Response(
+ *     response=404,
+ *     description="Une erreur est survenue.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *   )
+ * )
  */
 $app->get('/get/sites', function (Request $request, Response $response) {
  $data = new Data();
@@ -182,11 +212,12 @@ $app->get('/get/sites', function (Request $request, Response $response) {
   $data->message = $e->getMessage();
  }
 
- return $response->withJson($data, $data->code);
+ return $response->withHeader('Access-Control-Allow-Origin', '*')->withJson($data, $data->code);
 });
 
 /**
- * @OA\Post(
+ * NON AFFICHE
+ * @OA\ Post
  *     path="/post/lieu",
  *     summary="Ajout d'un lieu avec ses pointxy et ses sensors",
  *     @OA\RequestBody(
@@ -272,7 +303,8 @@ $app->post('/post/lieu', function (Request $request, Response $response) {
 });
 
 /**
- * @OA\Delete(
+ * NON AFFICHE
+ * @OA\ Delete
  *     path="/delete/lieu/{id}",
  *     tags={"id"},
  *     summary="Suppression d'un lieu et de ses sensors et pointxy",
@@ -321,25 +353,30 @@ $app->delete('/delete/lieu/{id}', function (Request $request, Response $response
 
 /**
  * @OA\Get(
- *     path="/get/sensor/pulsation/{idsensor}",
- *     tags={"idsensor"},
- *     summary="Permet d'incrémenter ou décrémenter la valeur en fonction du l'id du sensor",
- *     description="Permet d'incrémenter ou décrémenter la valeur en fonction du l'id du sensor",
+ *   path="/get/sensor/pulsation/{idsensor}",
+ *   summary="Permet d'incrémenter ou décrémenter la valeur en fonction du sensor passé en paramètre.",
+ *   tags={"Sensor"},
  *     @OA\Parameter(
  *         name="idsensor",
  *         in="path",
- *         description="ID du sensor",
+ *         description="ID du sensor.",
  *         required=true,
  *         @OA\Schema(
- *             type="integer",
- *             format="int64"
- *             example="3"
- *         )
+ *           type="integer",
+ *           format="int64"
+ *         ),
  *     ),
- *     @OA\Response(
- *         response=200,
- *         description="{"status":"success","message":"Valeur mise \u00e0 jour (-1)","code":200,"data":""}",
- *     )
+ *   @OA\Response(
+ *     response=200,
+ *     description="Incrémentation ou décrémentation effectuée.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *
+ *   ),
+ *   @OA\Response(
+ *     response=404,
+ *     description="Une erreur est survenue.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *   )
  * )
  */
 $app->get('/get/sensor/pulsation/{idsensor}', function (Request $request, Response $response) {
@@ -378,30 +415,35 @@ $app->get('/get/sensor/pulsation/{idsensor}', function (Request $request, Respon
   $data->message = $e->getMessage();
  }
 
- return $response->withJson($data, $data->code);
+ return $response->withHeader('Access-Control-Allow-Origin', '*')->withJson($data, $data->code);
 });
 
 /**
  * @OA\Get(
- *     path="/get/lieu/increment/{idlieu}",
- *     tags={"idlieu"},
- *     summary="Permet d'incrémenter la valeur en fonction de l'id du lieu",
- *     description="Permet d'incrémenter la valeur en fonction de l'id du lieu",
+ *   path="/get/lieu/increment/{idlieu}",
+ *   summary="Permet d'incrémenter la valeur en fonction du lieu en paramètre.",
+ *   tags={"Lieux"},
  *     @OA\Parameter(
  *         name="idlieu",
  *         in="path",
- *         description="ID du lieu",
+ *         description="ID du lieu.",
  *         required=true,
  *         @OA\Schema(
- *             type="integer",
- *             format="int64"
- *             example="3"
- *         )
+ *           type="integer",
+ *           format="int64"
+ *         ),
  *     ),
- *     @OA\Response(
- *         response=200,
- *         description="{"status":"success","message":"Valeur mise \u00e0 jour (1)","code":200,"data":""}",
- *     )
+ *   @OA\Response(
+ *     response=200,
+ *     description="Incrémentation effectuée.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *
+ *   ),
+ *   @OA\Response(
+ *     response=404,
+ *     description="Une erreur est survenue.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *   )
  * )
  */
 $app->get('/get/lieu/increment/{idlieu}', function (Request $request, Response $response) {
@@ -422,30 +464,35 @@ $app->get('/get/lieu/increment/{idlieu}', function (Request $request, Response $
   $data->message = $e->getMessage();
  }
 
- return $response->withJson($data, $data->code);
+ return $response->withHeader('Access-Control-Allow-Origin', '*')->withJson($data, $data->code);
 });
 
 /**
  * @OA\Get(
- *     path="/get/lieu/decrement/{idlieu}",
- *     tags={"idlieu"},
- *     summary="Permet de décrémenter la valeur en fonction de l'id du lieu",
- *     description="Permet de décrémenter la valeur en fonction de l'id du lieu",
+ *   path="/get/lieu/decrement/{idlieu}",
+ *   summary="Permet de décrémenter la valeur en fonction du lieu en paramètre.",
+ *   tags={"Lieux"},
  *     @OA\Parameter(
  *         name="idlieu",
  *         in="path",
- *         description="ID du lieu",
+ *         description="ID du lieu.",
  *         required=true,
  *         @OA\Schema(
- *             type="integer",
- *             format="int64"
- *             example="3"
- *         )
+ *           type="integer",
+ *           format="int64"
+ *         ),
  *     ),
- *     @OA\Response(
- *         response=200,
- *         description="{"status":"success","message":"Valeur mise \u00e0 jour (-1)","code":200,"data":""}",
- *     )
+ *   @OA\Response(
+ *     response=200,
+ *     description="Décrémentation effectuée.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *
+ *   ),
+ *   @OA\Response(
+ *     response=404,
+ *     description="Une erreur est survenue.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *   )
  * )
  */
 $app->get('/get/lieu/decrement/{idlieu}', function (Request $request, Response $response) {
@@ -466,19 +513,43 @@ $app->get('/get/lieu/decrement/{idlieu}', function (Request $request, Response $
   $data->message = $e->getMessage();
  }
 
- return $response->withJson($data, $data->code);
+ return $response->withHeader('Access-Control-Allow-Origin', '*')->withJson($data, $data->code);
 });
 
 /**
- * Retourner les prévisions IA.
- * {idlocation} id location.
+ * @OA\Get(
+ *   path="/get/previsions/{idlieu}",
+ *   summary="Retourne les prévisions IA.",
+ *   tags={"Previsions"},
+ *     @OA\Parameter(
+ *         name="idlieu",
+ *         in="path",
+ *         description="ID du lieu.",
+ *         required=true,
+ *         @OA\Schema(
+ *           type="integer",
+ *           format="int64"
+ *         ),
+ *     ),
+ *   @OA\Response(
+ *     response=200,
+ *     description="Dernière prévisions en date pour le lieu.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *
+ *   ),
+ *   @OA\Response(
+ *     response=404,
+ *     description="Une erreur est survenue.",
+ *     @OA\JsonContent(ref="#/components/schemas/Data")
+ *   )
+ * )
  */
-$app->get('/get/previsions/{idlocation}', function (Request $request, Response $response){
+$app->get('/get/previsions/{idlieu}', function (Request $request, Response $response){
    $data = new Data();
 
    try{
        $db = Database::getInstance()->getDb();
-       $idlocation = $request->getAttribute('idlocation');
+       $idlocation = $request->getAttribute('idlieu');
 
        $query = $db->prepare('SELECT * FROM iadata WHERE id_location = :idlocation ORDER BY date_update DESC');
        $query->bindParam(':idlocation', $idlocation, PDO::PARAM_INT);
@@ -500,7 +571,7 @@ $app->get('/get/previsions/{idlocation}', function (Request $request, Response $
        $data->message = $e->getMessage();
    }
 
-   return $response->withJson($data, $data->code);
+   return $response->withHeader('Access-Control-Allow-Origin', '*')->withJson($data, $data->code);
 });
 
 $app->run();

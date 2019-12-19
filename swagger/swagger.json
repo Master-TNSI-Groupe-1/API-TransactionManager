@@ -1,84 +1,354 @@
 {
     "openapi": "3.0.0",
+    "info": {
+        "title": "Documentation de l'API",
+        "description": "Cette API permet de gérer les sites et lieux (récupération d'informations, incrémentation/décrémentation du nombre de places).",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://3.87.54.32",
+            "description": "API Production"
+        },
+        {
+            "url": "http://localhost:8080",
+            "description": "API Test"
+        }
+    ],
     "paths": {
-        "/get/event/{id}": {
-            "post": {
+        "/get/lieux/{idsite}": {
+            "get": {
+                "tags": [
+                    "Lieux"
+                ],
+                "summary": "Récupère les lieux pour un site passé en paramètre.",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "idsite",
                         "in": "path",
-                        "description": "ID de l'evenement",
+                        "description": "ID du site.",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "format": "int64"
                         }
                     }
                 ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "id": {
-                                        "type": "integer"
-                                    },
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "endroit": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object",
-                                "example": {
-                                    "id": 10,
-                                    "name": "Déjeuner",
-                                    "endroit": "RU Mont Houy"
+                "responses": {
+                    "200": {
+                        "description": "Une liste de lieux.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
                                 }
                             }
                         }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successfully added"
+                    },
+                    "404": {
+                        "description": "Une erreur est survenue.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
                     }
                 }
             }
         },
-        "/get/allevents": {
+        "/get/lieu/{idlieu}": {
             "get": {
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "id": {
-                                        "type": "integer"
-                                    },
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "endroit": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object",
-                                "example": {
-                                    "id": 10,
-                                    "name": "Déjeuner",
-                                    "endroit": "RU Mont Houy"
+                "tags": [
+                    "Lieux"
+                ],
+                "summary": "Récupère les informations d'un lieu en paramètre (infos du lieu, capteurs, coordonnées).",
+                "parameters": [
+                    {
+                        "name": "idlieu",
+                        "in": "path",
+                        "description": "ID du lieu.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Informations d'un lieu.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Une erreur est survenue.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
                                 }
                             }
                         }
                     }
-                },
+                }
+            }
+        },
+        "/get/sites": {
+            "get": {
+                "tags": [
+                    "Sites"
+                ],
+                "summary": "Récupère les sites.",
                 "responses": {
                     "200": {
-                        "description": "Successfully added"
+                        "description": "Une liste de sites.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Une erreur est survenue.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/get/sensor/pulsation/{idsensor}": {
+            "get": {
+                "tags": [
+                    "Sensor"
+                ],
+                "summary": "Permet d'incrémenter ou décrémenter la valeur en fonction du sensor passé en paramètre.",
+                "parameters": [
+                    {
+                        "name": "idsensor",
+                        "in": "path",
+                        "description": "ID du sensor.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Incrémentation ou décrémentation effectuée.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Une erreur est survenue.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/get/lieu/increment/{idlieu}": {
+            "get": {
+                "tags": [
+                    "Lieux"
+                ],
+                "summary": "Permet d'incrémenter la valeur en fonction du lieu en paramètre.",
+                "parameters": [
+                    {
+                        "name": "idlieu",
+                        "in": "path",
+                        "description": "ID du lieu.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Incrémentation effectuée.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Une erreur est survenue.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/get/lieu/decrement/{idlieu}": {
+            "get": {
+                "tags": [
+                    "Lieux"
+                ],
+                "summary": "Permet de décrémenter la valeur en fonction du lieu en paramètre.",
+                "parameters": [
+                    {
+                        "name": "idlieu",
+                        "in": "path",
+                        "description": "ID du lieu.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Décrémentation effectuée.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Une erreur est survenue.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/get/previsions/{idlieu}": {
+            "get": {
+                "tags": [
+                    "Previsions"
+                ],
+                "summary": "Retourne les prévisions IA.",
+                "parameters": [
+                    {
+                        "name": "idlieu",
+                        "in": "path",
+                        "description": "ID du lieu.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dernière prévisions en date pour le lieu.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Une erreur est survenue.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Data"
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+    },
+    "components": {
+        "schemas": {
+            "Data": {
+                "title": "Data model",
+                "description": "Modèle de données de l'API.",
+                "properties": {
+                    "status": {
+                        "title": "Status",
+                        "description": "Status de l'action.",
+                        "type": "string",
+                        "format": "string",
+                        "default": "error"
+                    },
+                    "message": {
+                        "title": "Message",
+                        "description": "Message associé au résultat de l'action.",
+                        "type": "string",
+                        "format": "string",
+                        "default": ""
+                    },
+                    "code": {
+                        "title": "Code",
+                        "description": "Code de retour HTTP.",
+                        "type": "integer",
+                        "format": "int64",
+                        "default": 404
+                    },
+                    "data": {
+                        "title": "Données",
+                        "description": "Données retournées par l'API.",
+                        "type": "string",
+                        "format": "string",
+                        "default": ""
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "parameters": {
+            "id": {
+                "name": "id",
+                "in": "path",
+                "description": "ID du lieu à supprimer",
+                "required": true,
+                "schema": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "requestBodies": {}
     }
 }
