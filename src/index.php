@@ -70,7 +70,7 @@ $app->get('/get/lieux/{idsite}', function (Request $request, Response $response)
   $db = Database::getInstance()->getDb();
 
   // Récupère les lieux
-  $query = $db->prepare("SELECT * FROM location WHERE id_site = :idsite");
+  $query = $db->prepare("SELECT * FROM location WHERE id_site = :idsite AND is_enabled = 1");
   $query->bindParam(':idsite', $id, PDO::PARAM_INT);
   $query->execute();
 
@@ -353,13 +353,13 @@ $app->delete('/delete/lieu/{id}', function (Request $request, Response $response
 
 /**
  * @OA\Get(
- *   path="/get/sensor/pulsation/{idsensor}",
+ *   path="/get/sensor/pulsation/{sensorname}",
  *   summary="Permet d'incrémenter ou décrémenter la valeur en fonction du sensor passé en paramètre.",
  *   tags={"Sensor"},
  *     @OA\Parameter(
- *         name="idsensor",
+ *         name="sensorname",
  *         in="path",
- *         description="ID du sensor.",
+ *         description="Nom du sensor.",
  *         required=true,
  *         @OA\Schema(
  *           type="integer",
@@ -379,23 +379,23 @@ $app->delete('/delete/lieu/{id}', function (Request $request, Response $response
  *   )
  * )
  */
-$app->get('/get/sensor/pulsation/{idsensor}', function (Request $request, Response $response) {
+$app->get('/get/sensor/pulsation/{sensorname}', function (Request $request, Response $response) {
  $data = new Data();
 
  try {
   $db = Database::getInstance()->getDb();
 
   // Récup l'id du sensor en paramètre
-  $idsensor = $request->getAttribute('idsensor');
+  $sensorname = $request->getAttribute('sensorname');
 
   // On récupère les infos du lieu et sensors associé à l'id du sensor
-  $query = $db->prepare('SELECT * FROM sensors s, location l WHERE l.id_location = s.id_location AND s.id_sensor = :idsensor');
-  $query->bindParam(':idsensor', $idsensor, PDO::PARAM_INT);
+  $query = $db->prepare('SELECT * FROM sensors s, location l WHERE l.id_location = s.id_location AND s.sensor_name = :sensor_name');
+  $query->bindParam(':sensor_name', $sensorname, PDO::PARAM_INT);
   $query->execute();
   $lieu = $query->fetch(PDO::FETCH_OBJ);
 
   if ($lieu) {
-   $idlieu                                    = $lieu->id_location;
+   $idlieu = $lieu->id_location;
    (1 == $lieu->is_input) ? $valueinputsensor = 1 : $valueinputsensor = -1;
 
    // En fonction du type de sensor on incrémente ou décrémente la valeur instantanée de 1.
