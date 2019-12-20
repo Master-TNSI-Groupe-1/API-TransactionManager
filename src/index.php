@@ -70,7 +70,7 @@ $app->get('/get/lieux/{idsite}', function (Request $request, Response $response)
   $db = Database::getInstance()->getDb();
 
   // Récupère les lieux
-  $query = $db->prepare("SELECT * FROM location WHERE id_site = :idsite");
+  $query = $db->prepare("SELECT * FROM location WHERE id_site = :idsite AND is_enabled = 1");
   $query->bindParam(':idsite', $id, PDO::PARAM_INT);
   $query->execute();
 
