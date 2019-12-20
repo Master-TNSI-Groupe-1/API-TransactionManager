@@ -130,7 +130,7 @@
                 }
             }
         },
-        "/get/sensor/pulsation/{idsensor}": {
+        "/get/sensor/pulsation/{sensorname}": {
             "get": {
                 "tags": [
                     "Sensor"
@@ -138,9 +138,9 @@
                 "summary": "Permet d'incrémenter ou décrémenter la valeur en fonction du sensor passé en paramètre.",
                 "parameters": [
                     {
-                        "name": "idsensor",
+                        "name": "sensorname",
                         "in": "path",
-                        "description": "ID du sensor.",
+                        "description": "Nom du sensor.",
                         "required": true,
                         "schema": {
                             "type": "integer",
